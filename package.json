@@ -1,0 +1,11 @@
+{
+  "name": "qap2-fullstack-js",
+  "version": "1.0.0",
+  "description": "QAP 2: Fullstack JavaScript - A working web server with event logging",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vanessa Rice",
+  "license": "MIT"
+}
