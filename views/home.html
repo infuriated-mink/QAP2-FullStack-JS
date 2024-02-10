@@ -3,9 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QAP 2: Fullstack JavaScript</title>
+    <title>Home Page</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h2>Home Page</h2>
+    <h1>Welcome to Our Website</h1>
+    <div class="weather-container">
+        <h2 class="weather-header">Today's Weather</h2>
+        <div id="weather-info" class="weather-info"></div>
+    </div>
+    <h2>Latest News Headlines</h2>
+    <ul id="news-list"></ul>
+
+    <script>
+        // Replace with actual weather and news data
+        const weatherInfo = {{weather}};
+        const newsHeadlines = {{news}};
+
+        // Display weather information
+        const weatherInfoElement = document.getElementById('weather-info');
+        weatherInfoElement.innerHTML = `
+            <div class="weather-current">${weatherInfo.current.skytext}, ${weatherInfo.current.temperature}&deg;C</div>
+            <div class="weather-forecast">
+                <h3 class="weather-header">Forecast</h3>
+                ${weatherInfo.forecast.map(forecast => `
+                    <div class="weather-forecast-item">${forecast.day}: ${forecast.skytextday}, ${forecast.low}&deg;C-${forecast.high}&deg;C</div>
+                `).join('')}
+            </div>
+        `;
+
+        // Display news headlines
+        const newsList = document.getElementById('news-list');
+        newsHeadlines.forEach(news => {
+            const listItem = document.createElement('li');
+            const link = document.createElement('a');
+            link.href = news.url;
+            link.textContent = news.title;
+            listItem.appendChild(link);
+            newsList.appendChild(listItem);
+        });
+    </script>
 </body>
 </html>

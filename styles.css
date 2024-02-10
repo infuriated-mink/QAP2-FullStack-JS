@@ -1,0 +1,29 @@
+.weather-container {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.weather-info {
+    font-family: Arial, sans-serif;
+}
+
+.weather-header {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.weather-current {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.weather-forecast {
+    margin-top: 10px;
+}
+
+.weather-forecast-item {
+    margin-bottom: 5px;
+}
