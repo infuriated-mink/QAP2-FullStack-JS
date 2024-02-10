@@ -18,7 +18,7 @@ const createLogFile = () => {
     if (!fs.existsSync(logDir)) {
         fs.mkdirSync(logDir);
     }
-    const logFileName = `${currentDate.toISOString().slice(0,10)}.log`;
+    const logFileName = `${currentDate.toISOString().slice(0, 10)}.log`;
     return path.join(logDir, logFileName);
 }
 
@@ -40,12 +40,7 @@ const getNewsHeadlines = async () => {
         const response = await newsapi.v2.topHeadlines({
             country: 'ca'
         });
-        // Modify the response to include the URL of each article
-        const articlesWithLinks = response.articles.map(article => ({
-            ...article,
-            link: article.url  // Add the URL of the article as 'link' property
-        }));
-        return articlesWithLinks;
+        return response.articles;
     } catch (error) {
         console.error(error);
         return [];
@@ -60,7 +55,7 @@ server.on('request', async (request, response) => {
     let filePath = '';
 
     // Determine action based on the route requested
-    switch(url) {
+    switch (url) {
         case '/':
             // Fetch weather and news information
             const [weatherInfo, newsHeadlines] = await Promise.all([
@@ -93,6 +88,9 @@ server.on('request', async (request, response) => {
             break;
         // Handle other routes as before
     }
+
+    // Emit event for route access
+    myEmitter.emit('routeAccess', url);
 });
 
 // Listen on the correct port

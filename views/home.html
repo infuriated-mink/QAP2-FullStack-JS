@@ -4,42 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-    <h1>Welcome to Our Website</h1>
-    <div class="weather-container">
-        <h2 class="weather-header">Today's Weather</h2>
-        <div id="weather-info" class="weather-info"></div>
+    <div class="container">
+        <h1>Welcome to Our Website</h1>
+        <h2>Today's Weather</h2>
+        <div id="weather-info" class="weather-card">
+            <div class="weather-detail">
+                <h3>Current Temperature</h3>
+                <p>{{weather.current.temperature}}°C</p>
+            </div>
+            <div class="weather-detail">
+                <h3>Weather Condition</h3>
+                <p>{{weather.current.skytext}}</p>
+            </div>
+        </div>
+        <h2>Latest News Headlines</h2>
+        <ul id="news-list"></ul>
     </div>
-    <h2>Latest News Headlines</h2>
-    <ul id="news-list"></ul>
 
     <script>
-        // Replace with actual weather and news data
-        const weatherInfo = {{weather}};
-        const newsHeadlines = {{news}};
-
-        // Display weather information
-        const weatherInfoElement = document.getElementById('weather-info');
-        weatherInfoElement.innerHTML = `
-            <div class="weather-current">${weatherInfo.current.skytext}, ${weatherInfo.current.temperature}&deg;C</div>
-            <div class="weather-forecast">
-                <h3 class="weather-header">Forecast</h3>
-                ${weatherInfo.forecast.map(forecast => `
-                    <div class="weather-forecast-item">${forecast.day}: ${forecast.skytextday}, ${forecast.low}&deg;C-${forecast.high}&deg;C</div>
-                `).join('')}
-            </div>
-        `;
-
         // Display news headlines
         const newsList = document.getElementById('news-list');
-        newsHeadlines.forEach(news => {
+        const newsData = {{news}};
+        newsData.forEach(news => {
             const listItem = document.createElement('li');
-            const link = document.createElement('a');
-            link.href = news.url;
-            link.textContent = news.title;
-            listItem.appendChild(link);
+            const anchor = document.createElement('a');
+            anchor.textContent = news.title;
+            anchor.href = news.url;
+            anchor.target = "_blank"; 
+            listItem.appendChild(anchor);
             newsList.appendChild(listItem);
         });
     </script>

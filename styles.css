@@ -1,29 +1,65 @@
-.weather-container {
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-}
-
-.weather-info {
+body {
     font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
 }
 
-.weather-header {
-    font-size: 1.2rem;
-    font-weight: bold;
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-.weather-current {
-    font-size: 1.1rem;
-    margin-bottom: 5px;
+h1 {
+    text-align: center;
+    color: #007bff;
 }
 
-.weather-forecast {
-    margin-top: 10px;
+h2 {
+    color: #333;
 }
 
-.weather-forecast-item {
-    margin-bottom: 5px;
+.weather-card {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.weather-detail {
+    flex: 1;
+}
+
+.weather-detail h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.weather-detail p {
+    margin: 0;
+}
+
+#news-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#news-list li {
+    margin-bottom: 10px;
+}
+
+#news-list a {
+    text-decoration: none;
+    color: #333;
+    transition: color 0.3s;
+}
+
+#news-list a:hover {
+    color: #007bff;
 }
