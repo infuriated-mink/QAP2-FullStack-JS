@@ -8,6 +8,7 @@ const NEWS_API_KEY = '854eee0cd7c14a6fbe6f6635696189e4';
 
 function handleRoutes(url, callback) {
     let filePath = '';
+    let statusCode = 200;
 
     // Determine action based on the route requested
     switch(url) {
@@ -30,6 +31,21 @@ function handleRoutes(url, callback) {
         case '/faqs':
             console.log("FAQ page requested");
             filePath = './views/faq.html';
+            break;
+        case '/badrequest':
+            console.log("Bad Request");
+            statusCode = 400;
+            filePath = './views/error.html';
+            break;
+        case '/unauthorized':
+            console.log("Unauthorized");
+            statusCode = 401;
+            filePath = './views/error.html';
+            break;
+        case '/forbidden':
+            console.log("Forbidden");
+            statusCode = 403;
+            filePath = './views/error.html';
             break;
         default:
             console.log("Home page requested");
@@ -56,7 +72,7 @@ function handleRoutes(url, callback) {
                     .replace('{{weather}}', JSON.stringify(weatherResult[0], null, 2))
                     .replace('{{news}}', JSON.stringify(newsResult.articles, null, 2));
 
-                callback(200, 'text/html', html);
+                callback(statusCode, 'text/html', html);
             }).catch(error => {
                 console.error(error);
                 callback(500, 'text/plain', 'Internal Server Error');
