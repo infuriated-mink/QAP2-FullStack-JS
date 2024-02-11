@@ -1,88 +1,105 @@
 const http = require('http');
 const fs = require('fs');
-const path = require('path');
 const EventEmitter = require('events');
+const path = require('path');
+const weather = require('weather-js');
+const NewsAPI = require('newsapi');
+
+// News API key
+const NEWS_API_KEY = '854eee0cd7c14a6fbe6f6635696189e4';
 
 // Instantiate an event emitter
 const myEmitter = new EventEmitter();
 
-// Create a multi-route HTTP server
-const server = http.createServer();
+// Function to create daily log file
+const createLogFile = () => {
+    const currentDate = new Date();
+    const logDir = './logs';
+    if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir);
+    }
+    const logFileName = `${currentDate.toISOString().slice(0,10)}.log`;
+    return path.join(logDir, logFileName);
+}
 
-// Function to log events to disk
-function logEvent(route) {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = (today.getMonth() + 1).toString().padStart(2, '0');
-    const day = today.getDate().toString().padStart(2, '0');
-    const fileName = `${year}-${month}-${day}.log`;
-    const filePath = path.join(__dirname, 'logs', fileName);
-    const logMessage = `[${today.toISOString()}] Route accessed: ${route}\n`;
-
-    fs.appendFile(filePath, logMessage, (err) => {
+// Function to fetch weather information for St. John's, Newfoundland and Labrador, Canada
+function getWeatherInfo(callback) {
+    weather.find({ search: 'St. John\'s, NL, Canada', degreeType: 'F' }, (err, result) => {
         if (err) {
-            console.error('Error writing to log file:', err);
+            callback(err, null);
+        } else {
+            const weatherData = result[0];
+            // Convert temperature from Fahrenheit to Celsius
+            weatherData.current.temperature = ((weatherData.current.temperature - 32) / 1.8).toFixed(2);
+            weatherData.forecast.forEach(day => {
+                day.high = ((day.high - 32) / 1.8).toFixed(2);
+                day.low = ((day.low - 32) / 1.8).toFixed(2);
+            });
+            callback(null, weatherData);
         }
     });
 }
 
-server.on('request', (request, response) => {
-    // Use the request.url to determine the URL entered
+// Function to fetch news headlines for Canada
+const getNewsHeadlines = async () => {
+    const newsapi = new NewsAPI(NEWS_API_KEY);
+    try {
+        const response = await newsapi.v2.topHeadlines({
+            country: 'ca'
+        });
+        return response.articles;
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
+}
+
+// Create a multi-route HTTP server
+const server = http.createServer();
+
+server.on('request', async (request, response) => {
     const { url } = request;
     let filePath = '';
 
     // Determine action based on the route requested
     switch(url) {
-        case '/about':
-            console.log("About page requested"); 
-            filePath = './views/about.html';
+        case '/':
+            // Fetch weather and news information
+            const [weatherInfo, newsHeadlines] = await Promise.all([
+                new Promise((resolve, reject) => {
+                    getWeatherInfo((err, data) => {
+                        if (err) reject(err);
+                        else resolve(data);
+                    });
+                }),
+                getNewsHeadlines()
+            ]);
+
+            // Read the home page HTML template
+            fs.readFile('./views/home.html', 'utf8', (err, data) => {
+                if (err) {
+                    console.error(err);
+                    response.writeHead(500, { 'Content-Type': 'text/plain' });
+                    response.end('Internal Server Error');
+                } else {
+                    // Replace placeholders in the HTML template with weather and news information
+                    const html = data
+                        .replace('{{weather}}', JSON.stringify(weatherInfo, null, 2))
+                        .replace('{{news}}', JSON.stringify(newsHeadlines, null, 2));
+
+                    // Send the modified HTML response to the client
+                    response.writeHead(200, { 'Content-Type': 'text/html' });
+                    response.end(html);
+                }
+            });
             break;
-        case '/contact':
-            console.log("Contact page requested");
-            filePath = './views/contact.html';
-            break;
-        case '/products':
-            console.log("Products page requested");
-            filePath = './views/products.html';
-            break;
-        case '/subscribe':
-            console.log("Subscribe page requested");
-            filePath = './views/subscribe.html';
-            break;
-        case '/services':
-            console.log("Services page requested");
-            filePath = './views/services.html';
-            break;
-        case '/faq':
-            console.log("FAQ page requested");
-            filePath = './views/faq.html';
-            break;
+        // Handle other routes as needed
         default:
-            console.log("Home page requested");
-            filePath = './views/home.html';
-    }
-
-    // Log the route access
-    myEmitter.emit('routeAccess', url);
-
-    // Read HTML files from disk
-    fs.readFile(filePath, (err, data) => {
-        if (err) {
-            console.error(err);
-            response.writeHead(404, { 'Content-Type': 'text/html' });
+            // Handle 404 Not Found
+            response.writeHead(404, { 'Content-Type': 'text/plain' });
             response.end('404 Not Found');
-        } else {
-            response.writeHead(200, { 'Content-Type': 'text/html' });
-            response.end(data);
-        }
-    });
+    }
 });
-
-// Ensure logs directory exists
-const logsDir = path.join(__dirname, 'logs');
-if (!fs.existsSync(logsDir)) {
-    fs.mkdirSync(logsDir);
-}
 
 // Listen on the correct port
 const PORT = 3000;
@@ -91,7 +108,16 @@ server.listen(PORT, () => {
 });
 
 // Implement event scenarios
+// Log route access to console and disk
 myEmitter.on('routeAccess', (route) => {
     console.log(`Route accessed: ${route}`);
-    logEvent(route);
+
+    // Log to disk
+    const logMessage = `${new Date().toISOString()} - Route accessed: ${route}\n`;
+    const logFilePath = createLogFile();
+    fs.appendFile(logFilePath, logMessage, (err) => {
+        if (err) {
+            console.error(`Error writing to log file: ${err}`);
+        }
+    });
 });
