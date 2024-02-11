@@ -2,6 +2,11 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const EventEmitter = require('events');
+const weather = require('weather-js');
+const NewsAPI = require('newsapi');
+
+// News API key
+const NEWS_API_KEY = '854eee0cd7c14a6fbe6f6635696189e4';
 
 // Instantiate an event emitter
 const myEmitter = new EventEmitter();
@@ -26,7 +31,7 @@ function logEvent(route) {
     });
 }
 
-server.on('request', (request, response) => {
+server.on('request', async (request, response) => {
     // Use the request.url to determine the URL entered
     const { url } = request;
     let filePath = '';
@@ -49,11 +54,7 @@ server.on('request', (request, response) => {
             console.log("Subscribe page requested");
             filePath = './views/subscribe.html';
             break;
-        case '/services':
-            console.log("Services page requested");
-            filePath = './views/services.html';
-            break;
-        case '/faq':
+        case '/faqs':
             console.log("FAQ page requested");
             filePath = './views/faq.html';
             break;
@@ -66,14 +67,34 @@ server.on('request', (request, response) => {
     myEmitter.emit('routeAccess', url);
 
     // Read HTML files from disk
-    fs.readFile(filePath, (err, data) => {
+    fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) {
             console.error(err);
             response.writeHead(404, { 'Content-Type': 'text/html' });
             response.end('404 Not Found');
         } else {
-            response.writeHead(200, { 'Content-Type': 'text/html' });
-            response.end(data);
+            // Fetch weather and news information
+            Promise.all([
+                new Promise((resolve, reject) => {
+                    weather.find({ search: 'St. John\'s, NL, Canada', degreeType: 'F' }, (err, result) => {
+                        if (err) reject(err);
+                        else resolve(result);
+                    });
+                }),
+                new NewsAPI(NEWS_API_KEY).v2.topHeadlines({ country: 'ca' })
+            ]).then(([weatherResult, newsResult]) => {
+                // Replace placeholders in the HTML template with weather and news information
+                const html = data
+                    .replace('{{weather}}', JSON.stringify(weatherResult[0], null, 2))
+                    .replace('{{news}}', JSON.stringify(newsResult.articles, null, 2));
+
+                response.writeHead(200, { 'Content-Type': 'text/html' });
+                response.end(html);
+            }).catch(error => {
+                console.error(error);
+                response.writeHead(500, { 'Content-Type': 'text/plain' });
+                response.end('Internal Server Error');
+            });
         }
     });
 });
