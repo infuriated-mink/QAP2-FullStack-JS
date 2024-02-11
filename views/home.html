@@ -4,73 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #007bff;
-        }
-
-        h2 {
-            color: #333;
-        }
-
-        #weather-info {
-            background-color: #fff;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .weather-card {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .weather-card .weather-detail {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #f0f0f0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .weather-card .weather-detail h3 {
-            margin-top: 0;
-            margin-bottom: 5px;
-        }
-
-        .forecast {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .forecast .forecast-item {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #f0f0f0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    <link rel="stylesheet" href = "/public/styles.css">
 </head>
 <body>
+    <header>
+    <nav class="navbar">
+        <div class="dropdown">
+            <button class="dropbtn">Menu</button>
+            <div class="dropdown-content">
+                <a href="/">Home</a>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/products">Products</a>
+                <a href="/subscribe">Subscribe</a>
+                <a href="/faqs">FAQ</a>
+            </div>
+        </div>
+    </nav>
+</header>
     <div class="container">
         <h1>Welcome to Our Website</h1>
         <h2>Today's Weather</h2>
